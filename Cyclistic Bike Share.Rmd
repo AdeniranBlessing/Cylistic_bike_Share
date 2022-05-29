@@ -1,0 +1,116 @@
+---
+title: "Cyclistic Bike Share"
+author: "Adeniran Blessing"
+date: '2022-05-21'
+output: 
+  html_document: 
+    fig_width: 5
+    fig_height: 3.5
+    fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+Num_of_ride_per_day_of_week <- read.csv("num_of_riders_per_day_of_week.csv")
+View(Num_of_ride_per_day_of_week)
+rideable_type_for_casual_riders <- read.csv("rideable_type_for_casual_riders.csv")
+View(rideable_type_for_casual_riders)
+rideable_type_for_member_riders <- read.csv("rideable_type_for_member_riders.csv")
+View(rideable_type_for_member_riders)
+Ride_per_length <- read.csv("Avg_ride_length_per_rider.csv")
+View(Ride_per_length)
+opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+* In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown to a fleet of 5,824 bicycles that are tracked and locked into a network of 692 stations across Chicago. The bikes can be unlocked from one station and returned to any other station in the system anytime
+
+* There are two types of Cyclists, those who purchase single-ride or full-day passes are casual riders, and those who purchase annual membership are Cyclists members. Cyclistic finance analysts have concluded that annual members are more profitable than casual riders and they believe that maximizing annual members will be key to future growth rather than creating a marketing campaign that targets all-new customers. 
+
+
+## Problem
+
+* How do annual members and casual riders use cyclistic bikes differently.
+
+## Cleaning and Manipulation
+
+* I download the recent 12-month data and unzipped the files, named them using appropriate file-naming conventions and I kept them in a folder, I created a sub-folder and moved the files into it to have the original data before I started my cleaning process.
+* I used Excel for my cleaning, opened each file, and removed some columns I won’t need for my analysis, including start station name, start station id, end station name, end station id, start lat, start log, and end lat, end log.
+* I created a column called “ride length”, and I calculated the length of each ride by subtracting the column “started at” from the column “ended at” and formatted it as HH:MM: SS (Time) I repeated this step for each file.
+* I created a column called “day of week” and I calculated the day of the week each ride started using the “WEEKDAY” command and formatted it as General, I repeated this step for each file.
+* I removed zero values (00:00:00) and negative values from the time column and removed blanks and other outliers using a filter from each file.
+* I didn’t save my files as Excel Workbook because I will have to import my cleaned data to SQL and it can’t accept excel workbook files. 
+
+
+## Summary
+
+* I import my cleaned data into my SQL workspace, merged all the 12-month data using UNION ALL, and named my new table.
+* After I merge my data, I count the number of rides by the member and casual riders.
+* I calculated the Average ride length for members and casual riders
+* I calculated the Average ride length for users by day of the week to know how both riders use their bikes per day of the week
+* I calculated the number of riders for users by day of the week.
+
+
+
+## Visualization
+The chart below shows the number of rides per day of the week for Casual riders. According to the chart, Casual riders use bikes most on weekends.
+Day of week: 1 <- Sunday, 2 <- Monday, 3 <- Tuesday, 4 <- Wednesday, 5 <- Thursday, 6 <- Friday, 7 <- Saturday.
+
+```{r}
+ggplot(data = Num_of_ride_per_day_of_week)+
+  geom_line(mapping = aes(x = day_of_week, y = num_of_riders))+
+  labs(title = "Rideable Preference For Member Riders")
+```
+
+The chart below shows the Average ride length by users. And the ride length of casual riders is 01:00:43 minutes more than member riders
+
+
+```{r}
+ggplot(data = Ride_per_length)+
+  geom_col(mapping = aes(x = User, y = avg_ride_length, fill = User))+
+  scale_fill_manual(values = c("blue", "green"))+
+  labs(title = "User_Avg_Ride_Length")
+
+```
+
+Rideable Preference for Casual Riders shows the type of rideable bikes casual riders prefer most. And according to the chart, most of the casual riders use classic_bike, followed by electric_bike.
+
+
+```{r}
+ggplot(data = rideable_type_for_casual_riders)+
+  geom_col(mapping = aes(x = rideable_type, y = ride_type_count, fill = rideable_type))+
+  scale_fill_manual(values = c("orange", "green", "red"))+
+  labs("Rideable Preference For Casual Riders")
+
+```
+Rideable Preference for Annual Member Riders shows the type of rideable bikes casual riders prefer most. According to the chart majority of the member, riders use classic bikes but don’t use docked_bikes.
+
+```{r}
+ggplot(data = rideable_type_for_member_riders)+
+  geom_col(mapping = aes(x = rideable_type, y = ride_type_count, fill = rideable_type))+
+  scale_fill_manual(values = c("orange", "green", "red"))+
+  labs(title = "Rideable Preference For Casual Riders")
+
+```
+
+
+## Key Findings
+
+* Casual riders tend to ride more, and their participation exceeded that of annual members
+* Casual riders like to use rides during the weekends as their usage peaked at weekends.
+* Annual members tend to use classic-bike more than other types of rides.
+
+## Conclusion
+
+* I now know how annual members and casual riders use bikes differently but are inconclusive because quantitative analysis needs to be done and geographically data should be provided to know the way the riders way of live.
+
+## Recommendation
+
+* Casual riders tend to use the classic bike more. that might be due to the pricing factor of docked bikes this suggests that docked bikes should be sold at a discounted rate.
+* Introducing weekday plans to casual riders as they use ride more during the week. The marketing can be done on the cyclistic bike share page, or on a flyer to give to the casual riders, or a text message or email can be sent to the casual riders so they will be able of the weekday plans available.
+* Membership rate for casual riders especially for those that ride on weekends would assist in targeting casual riders more specifically.
+
+
